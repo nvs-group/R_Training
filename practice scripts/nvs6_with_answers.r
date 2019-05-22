@@ -39,18 +39,17 @@ setequal(master1$soc2010ttl,master1$Occupation)  # = FALSE
 # Exercises below to practice filtering and sorting in R
 
 # 1 Number of Bachelor's degrees awards offered by state
-master1 %>% 
-  filter(str_detect(level_name, "Bachelor's")) %>%
-  group_by (stabbr) %>%
+master1 %>%
+  filter(str_detect(degree.name, "Bachelor's")) %>%
+  group_by (State) %>%
   summarize(n = n()) %>%
   arrange (desc(n))
-  
 
 # 2 List of institutions offering highest number of bachelor's degrees in VA
 master1 %>%
-  filter(stabbr == "VA",str_detect(level_name, "Bachelor's")) %>%
-  select(instnm,cip2010ttl,level_name) %>%
-  group_by(instnm) %>%
+  filter(State == "VA",str_detect(degree.name, "Bachelor's")) %>%
+  select(school.name,cip.name,degree.name) %>%
+  group_by(school.name) %>%
   summarize(n = n()) %>%
   arrange(desc(n))
 
