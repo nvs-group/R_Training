@@ -28,7 +28,7 @@ names(master1)
 master1 <- master1 %>% select (-id)
 
 # discover duplicate fields
-setequal(master1$soc2010ttl,master1$Occupation)  # = FALSE
+setequal(master1$soc.code,master1$soc.name)  # = FALSE
 
 
 #### Additional data cleaning tasks:
