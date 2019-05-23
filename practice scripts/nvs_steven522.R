@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 library(shiny)
 library(readr)
 library(ggplot2)
@@ -23,7 +22,7 @@ ui <- fluidPage(
       selectInput(inputId = "nvs.state",
                   label= "State:",
                   choices = names(table(master1$State)),
-                  selected = "ID"),
+                  selected = "VA"),
       
       hr(),
       h3("School Name"),
