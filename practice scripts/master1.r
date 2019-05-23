@@ -47,7 +47,17 @@ master1 %>%
   summarize(n = n()) %>%
   arrange(desc(n))
 
-# 3 Which occupation is the highest medium wage
+# 3 Which occupation has the highest medium wage
+master1 %>%
+  select(occupation,medwage) %>%
+  group_by(occupation) %>%
+  summarize(wage = max(medwage)) %>%
+  arrange(desc(wage))  
 
 # 4 Which institutions offer the highest sum of median-wage occupations by degree in VA?
-
+master1 %>%
+  filter(stabbr == "VA") %>%
+  group_by(occupation,cip2010ttl) %>%
+  summarize(sum = sum(medwage)) %>%
+  arrange(desc(sum))
+  
