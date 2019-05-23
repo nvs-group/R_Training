@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 library(shiny)
 library(readr)
 library(ggplot2)
@@ -71,4 +72,5 @@ server <- function(input, output, session) {
 }
 
 # Create Shiny app object
+
 shinyApp(ui = ui, server = server)
