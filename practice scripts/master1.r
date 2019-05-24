@@ -9,7 +9,7 @@ library(stringr)
 
 # master1_raw <- read.csv("~/R/nvs6/data/Master1_Table.txt", header=FALSE) # no headers
 # master1 <- read.csv("~/R/nvs6/data/master1_withHeaders.txt")
-master1 <- read.csv("https://www.dropbox.com/s/foyub5f65ccm2hk/master1_withHeaders.txt?dl=1")
+master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
 
 # put variable names in lower case
 names(master1) <- tolower(names(master1))
