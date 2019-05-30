@@ -1,6 +1,6 @@
 # code from https://community.rstudio.com/t/applying-multiple-filters-for-a-reactive-table/4932
 # on 20190530
-
+# uploaded to shinyapps.io - https://chapmjs.shinyapps.io/MasterThreeFilters/
 
 
 library(shiny)
