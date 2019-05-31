@@ -6,9 +6,7 @@ library(dplyr)
 library(DT)
 library(tools)
 
-# small change for demo purposes 
-
-# master1 <- read.csv("c:/Users/romri/Documents/Working/master1.txt")
+#master1 <- read.csv("c:/Users/romri/Documents/Working/master1.txt")
 master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
 
 #navbarPage sets up tab pages
