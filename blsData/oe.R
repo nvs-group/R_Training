@@ -1,5 +1,6 @@
 # oes survey
 # June 2019
+# download links from https://download.bls.gov/pub/time.series/oe/
 
 # import Current OE data
 oe.dataCurrent <- read.delim("https://download.bls.gov/pub/time.series/oe/oe.data.0.Current")
