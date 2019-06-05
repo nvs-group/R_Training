@@ -8,8 +8,8 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 
-#Read in main data table
-master1 <- read.csv("master1.txt")
+#Read in main data table from your local directory
+master1 <- read.csv("C:/Users/romri/Documents/NVS/shinyapp/master1.txt")
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -254,7 +254,20 @@ server <- function(input, output, session) {
            X10p >= input$nvs.income, InStOff <= input$nvs.tuition)
   })
   
-  
+  observe({
+    if(is.null(input$nvs.school.name)) {
+      updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))  
+    }
+    if(is.null(input$nvs.degree.name)) {
+      updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.occ.name)) {
+      updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
+    }
+    if(is.null(input$nvs.cip.name)) {
+      updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+  })
   #First Table
   observe ( {  
     #   req(input$nvs.school.name)
