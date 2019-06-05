@@ -16,58 +16,45 @@ cip1 <- cip2[order(cip2$CIP_Category),]
 #Read soc data table and order alphabetically
 soc2 <- read_tsv("soc_code.txt")
 soc1 <- soc2[order(soc2$SOC_Cat_Name),]
-
+#split soc into two groups
 soc_group1 <- (soc1$SOC_Cat_Name[1:12])
 soc_group2 <- (soc1$SOC_Cat_Name[13:24])
-
+#spit cip into 4 groups
 cip_group1 <- (cip1$CIP_Category[1:10])
 cip_group2 <- (cip1$CIP_Category[11:19])
 cip_group3 <- (cip1$CIP_Category[20:28])
 cip_group4 <- (cip1$CIP_Category[29:37])
 
-ui <- fluidPage(h1("NVS, LLC"),
+ui <- fluidPage(h1("College Planning"),
                 
-                navbarPage("College Planning",
-                           tabPanel("About",
-                                    h1("Welcome"),
-                                    hr(),
-                                    "Congratulations.",
-                                    "You have found the best",
-                                    "college planning app!"
-                           ),
-                           tabPanel("Preferences",
+                navbarPage("                   ",
+                           
+                           tabPanel("My Profile",
                                     
                                     navlistPanel(widths = c(3, 9),
                                                  tabPanel("Instructions",
                                                           h2("Go through each tab and select the items you currently know about")),
+                                                 
                                                  tabPanel("School select",
                                                           h3("I know exactly where I want to go:"),
-                                                          actionButton(inputId = "pre.school.button",
-                                                                       label = "Click to Add"),
                                                           
                                                           selectInput(inputId = "pre.school.name",
                                                                       label = "",
-                                                                      choices = c("All" = "",levels(master1$school.name)),
-                                                                      multiple = TRUE,
-                                                                      selected = "All")
+                                                                      choices = levels(master1$school.name),
+                                                                      multiple = TRUE)
                                                  ),
-                                                 
                                                  tabPanel("Degree select",
                                                           h3("What is the highest degree you are planning to get?"),
-                                                          actionButton(inputId = "pre.degree.button",
-                                                                       label = "Click to Add"),
                                                           
                                                           selectInput(inputId = "pre.degree.name",
                                                                       label = "",
-                                                                      choices = c("All" = "", levels(master1$degree.name)),
-                                                                      selected = "All", selectize = TRUE )
-                                                 
+                                                                      choices = levels(master1$degree.name),
+                                                                      multiple = TRUE)
                                                  ),
                                                  tabPanel("Occupation Category Select",
                                                           fluidRow(
                                                             h4("Which of these occupations would you consider?"),
-                                                            actionButton(inputId = "pre.occupation.button",
-                                                                         label = "Click to Add"),
+                                                            
                                                             hr(),
                                                             column(width = 6,
                                                                    checkboxGroupInput(inputId = "pre.occupation1",
@@ -77,15 +64,12 @@ ui <- fluidPage(h1("NVS, LLC"),
                                                                    checkboxGroupInput(inputId = "pre.occupation2",
                                                                                       label = "",
                                                                                       choices = soc_group2))
-                                                            
                                                           )
                                                  ),
                                                  tabPanel("Curriculum Category Select",
                                                           fluidPage(
                                                             h4("Please check all curriculum that you are interested in"),
                                                             
-                                                            actionButton(inputId = "pre.curriculum.button",
-                                                                         label = "Click to Add"),
                                                             fluidRow(
                                                               
                                                               column(width = 3,
@@ -109,111 +93,100 @@ ui <- fluidPage(h1("NVS, LLC"),
                                                                                         choices = cip_group4)
                                                               )
                                                             )
-                                                            
                                                           )),
                                                  tabPanel("Occupation Name select",
                                                           h3("What occupation are you planning to have?"),
-                                                          actionButton(inputId = "pre.occ.button",
-                                                                       label = "Click to Add"),
                                                           
                                                           selectInput(inputId = "pre.occ.name",
                                                                       label = "",
-                                                                      choices = c("All" = "", levels(master1$occ.name)),
-                                                                      multiple = TRUE,
-                                                                      selected = "All" )
-                                                  
+                                                                      choices = levels(master1$occ.name),
+                                                                      multiple = TRUE)
                                                  ),
                                                  
                                                  tabPanel("Curriculum Name select",
                                                           
                                                           h3("What curriculum are you planning to study?"),
                                                           
-                                                          actionButton(inputId = "pre.cip.button",
-                                                                       label = "Click to Add"),
-                                                          
                                                           selectInput(inputId = "pre.cip.name",
                                                                       label = "",
-                                                                      choices = c("All" = "", levels(master1$cip.name)),
-                                                                      multiple = TRUE,
-                                                                      selected = "All" )
+                                                                      choices = levels(master1$cip.name),
+                                                                      multiple = TRUE)
                                                  ),
                                                  
                                                  tabPanel("Salary Select",
-                                                          fluidRow(
-                                                            column(width = 12,
-                                                                   numericInput(inputId = "pre.income",
-                                                                                label = "How much income would you like to make in 10 to 15 years",
-                                                                                value = 25000,
-                                                                                min = 20000,
-                                                                                max = 200000,
-                                                                                step = 1000)),
-                                                            hr(),
-                                                            actionButton(inputId = "pre.income.button",
-                                                                         label = "Click to Add")  
-                                                          )
+                                                          h3("How much income would you like to make in 10 to 15 years?"), 
+                                                          
+                                                          sliderInput(inputId = "pre.income",
+                                                                      label = "",
+                                                                      value = min(sort(unique(master1$X10p))),
+                                                                      min = min(sort(unique(master1$X10p))),
+                                                                      max = max(sort(unique(master1$X10p))))
+                                                          
                                                  ),
                                                  tabPanel("Max Tuition Select",
-                                                          fluidRow(
-                                                            column(width = 12,
-                                                                   numericInput(inputId = "pre.tuition",
-                                                                                label = "How much tuition would you like to pay per years",
-                                                                                value = 15000,
-                                                                                min = 5000,
-                                                                                max = 200000,
-                                                                                step = 1000)),
-                                                            hr(),
-                                                            actionButton(inputId = "pre.tuition.button",
-                                                                         label = "Click to Add")  
-                                                          )
+                                                          h3("How much tuition would you like to pay per years?"),
+                                                          
+                                                          sliderInput(inputId = "pre.tuition",
+                                                                      label = "",
+                                                                      value = max(sort(unique(master1$InStOff))),
+                                                                      min = min(sort(unique(master1$InStOff))),
+                                                                      max = max(sort(unique(master1$InStOff))))
                                                  )
                                     )
-                          ),
-                           tabPanel("Scenerios",
+                           ),
+                           tabPanel("Build Scenerios",
                                     sidebarLayout(
                                       
                                       sidebarPanel(width = 3,
-                                        
-                                        selectInput(inputId = "nvs.school.name",
-                                                    label= "School Name:",
-                                                    choices = c("All" = "", levels(master1$school.name)),
-                                                    multiple = TRUE,
-                                                    selected = "All"),
-                                      
-                                        selectInput(inputId = "nvs.degree.name",
-                                                    label = "Degree Name:",
-                                                    choices = c("All" = "", levels(master1$degree.name)),
-                                                    selected = "All",
-                                                    selectize = TRUE),
-                                      
-                                        selectInput(inputId = "nvs.cip.cat",
-                                                    label = "Curriculum Category:",
-                                                    choices = c("All" = "", cip1$CIP_Category),
-                                                    multiple = TRUE,
-                                                    selected = "All"),
-                                       
-                                        selectInput(inputId = "nvs.occ.cat",
-                                                    label = "Occupation Category:",
-                                                    choices = c("All" = "", soc1$SOC_Cat_Name),
-                                                    multiple = TRUE,
-                                                    selected = "All"),
-                                        
-                                        selectInput(inputId = "nvs.cip.name",
-                                                    label = "Curriculum Name:",
-                                                    choices = c("All" = "", levels(master1$cip.name)),
-                                                    multiple = TRUE,
-                                                    selected = "All"),
-                                        
-                                        selectInput(inputId = "nvs.occ.name",
-                                                    label = "Occupation Name:",
-                                                    choices = c("All" = "", levels(master1$occ.name)),
-                                                    multiple = TRUE,
-                                                    selected = "All")
+                                                   
+                                                   selectInput(inputId = "nvs.school.name",
+                                                               label= "School Name:",
+                                                               choices =  levels(master1$school.name),
+                                                               multiple = TRUE),
+                                                   
+                                                   selectInput(inputId = "nvs.degree.name",
+                                                               label = "Degree Name:",
+                                                               choices =  levels(master1$degree.name),
+                                                               multiple = TRUE),
+                                                   
+                                                   selectInput(inputId = "nvs.cip.cat",
+                                                               label = "Curriculum Category:",
+                                                               choices = cip1$CIP_Category,
+                                                               multiple = TRUE),
+                                                   
+                                                   selectInput(inputId = "nvs.cip.name",
+                                                               label = "Curriculum Name:",
+                                                               choices = levels(master1$cip.name),
+                                                               multiple = TRUE),
+                                                   
+                                                   selectInput(inputId = "nvs.occ.cat",
+                                                               label = "Occupation Category:",
+                                                               choices = soc1$SOC_Cat_Name,
+                                                               multiple = TRUE),
+                                                   
+                                                   selectInput(inputId = "nvs.occ.name",
+                                                               label = "Occupation Name:",
+                                                               choices = levels(master1$occ.name),
+                                                               multiple = TRUE),
+                                                   
+                                                   sliderInput(inputId = "nvs.income",
+                                                               label = "Desired Income Level:",
+                                                               value = min(sort(unique(master1$X10p))),
+                                                               min = min(sort(unique(master1$X10p))),
+                                                               max = max(sort(unique(master1$X10p)))),
+                                                   
+                                                   sliderInput(inputId = "nvs.tuition",
+                                                               label = "Desired Tuition Level",
+                                                               value = max(sort(unique(master1$InStOff))),
+                                                               min = min(sort(unique(master1$InStOff))),
+                                                               max = max(sort(unique(master1$InStOff))))
+                                                   
                                       ),
-                                                                 
+                                      
                                       #output
                                       mainPanel(width = 9,
-                                        
-                                        DT::dataTableOutput(outputId = "nvs.choice.table")
+                                                
+                                                DT::dataTableOutput(outputId = "nvs.choice.table")
                                       )
                                     )    
                            ),
@@ -225,84 +198,158 @@ ui <- fluidPage(h1("NVS, LLC"),
                                                 
                                                 DT::dataTableOutput(outputId = "row.choice.table")
                                       )  
-                                      )
                                     )
+                           ),
+                           tabPanel("Tools"),
+                           
+                           
+                           tabPanel("About",
+                                    h1("Welcome"),
+                                    hr(),
+                                    "Congratulations.",
+                                    "You have found the best",
+                                    "college planning app!"
                            )
                 )
+)   
 
 server <- function(input, output, session) {
-
+  #Reactive variable that uses selected choices or full column if empty
+  
   school.name_var <- reactive({
     if(is.null(input$nvs.school.name )) {
-      levels(master1$school.name)} else {
+      sort(unique(master1$school.name))} else {
         input$nvs.school.name
-    }
+      }
   })
- 
+  
+  #Reactive variable that uses selected choices or full column if empty 
+  
   degree.name_var <- reactive({
     if(is.null(input$nvs.degree.name )) {
-      levels(master1$degree.name)} else {
+      sort(unique(master1$degree.name))} else {
         input$nvs.degree.name
       }
-  })   
-
+  })
+  #Reactive variable that uses selected choices or full column if empty
+  
   occ.name_var <- reactive({
-    if(is.null(input$nvs.occ.name )) {
-      levels(master1$occ.name)} else {
+    if(is.null(input$nvs.occ.name)) {
+      sort(unique(master1$occ.name))} else {
         input$nvs.occ.name
       }
-  })   
-
+  })  
+  #Reactive variable that uses selected choices or full column if empty
+  
   cip.name_var <- reactive({
-    if(is.null(input$nvs.cip.name )) {
-      levels(master1$cip.name)} else {
+    if(is.null(input$nvs.cip.name)) {
+      sort(unique(master1$cip.name))} else {
         input$nvs.cip.name
       }
-  })   
-
- table_var <- reactive({
-   master1 %>% filter(school.name %in% school.name_var(), degree.name %in% degree.name_var(),
-                      occ.name %in% occ.name_var(), cip.name %in% cip.name_var())
- })
-
+  })
+  #Filter for First Table
+  table_var <- reactive({
+    filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
+           occ.name %in% occ.name_var(), cip.name %in% cip.name_var(),
+           X10p >= input$nvs.income, InStOff <= input$nvs.tuition)
+  })
+  
+  
+  #First Table
   observe ( {  
- #   req(input$nvs.school.name)
+    #   req(input$nvs.school.name)
+    
     output$nvs.choice.table <- renderDataTable({
       DT::datatable(data = table_var(), 
                     options = list(pageLength = 10),selection = list(mode = "multiple"))
-      })
-  })
-  new_var <- reactive({
-    master1 %>% filter(school.name %in% school.name_var(), degree.name %in% degree.name_var(),
-                       occ.name %in% occ.name_var(), cip.name %in% cip.name_var()) %>% select(school.name, degree.name, cip.name,
-                                                                        occ.name,InStOff, X25p)
     })
-  
-  observeEvent(input$pre.school.button, {
-    if(is.null(input$pre.school.name)) return()
-      updateSelectInput(session, "nvs.school.name", "School Name:", selected = input$pre.school.name)
   })
-
-  observeEvent(input$pre.degree.button, {
-    if(is.null(input$pre.degree.name)) return()
+  #Using input to school prefernece to update other fields choices
+  observeEvent(input$nvs.school.name, {
+    if(is.null(input$nvs.degree.name)) {
+      updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.occ.name)) {
+      updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
+    }
+    if(is.null(input$nvs.cip.name)) {
+      updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+  })
+  
+  observeEvent(input$nvs.degree.name, {
+    if(is.null(input$nvs.school.name)) {
+      updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))
+    }
+    if(is.null(input$nvs.occ.name)) {
+      updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
+    }
+    if(is.null(input$nvs.cip.name)) {
+      updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+  })
+  observeEvent(input$nvs.occ.name, {
+    if(is.null(input$nvs.school.name)) {
+      updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))
+    }
+    if(is.null(input$nvs.degree.name)) {
+      updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.cip.name)) {
+      updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+  })  
+  observeEvent(input$nvs.cip.name, {  
+    if(is.null(input$nvs.school.name)) {
+      updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))
+    }
+    if(is.null(input$nvs.degree.name)) {
+      updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.occ.name)) {
+      updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
+    }
+    
+  })    
+  
+  
+  
+  
+  # from school choice on preference page  
+  observeEvent(input$pre.school.name, {
+    updateSelectInput(session, "nvs.school.name", "School Name:", selected = input$pre.school.name)
+  })
+  #Import degree choice to scenerio from degree choice on preference page  
+  observeEvent(input$pre.degree.name, {
     updateSelectInput(session, "nvs.degree.name", "Degree Name:", selected = input$pre.degree.name)
   })
-  
-  observeEvent(input$pre.occ.button, {
-    if(is.null(input$pre.occ.name)) return()
+  # from occupation name choice on preference page    
+  observeEvent(input$pre.occ.name, {
     updateSelectInput(session, "nvs.occ.name", "Occupation Name:", selected = input$pre.occ.name)
   })
-
-  observeEvent(input$pre.cip.button, {
-    if(is.null(input$pre.cip.name)) return()
+  # from curriculum name choice on preference page  
+  observeEvent(input$pre.cip.name, {
     updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", selected = input$pre.cip.name)
-  })  
-    
-   output$row.choice.table <- renderDataTable({ 
-     DT::datatable(data = new_var()[input$nvs.choice.table_rows_selected,],
-                   options = list(pageLength = 10), selection = list(mode = "none"))
+  })
+  # from income level choice on preference page  
+  observeEvent(input$pre.income, {
+    updateSliderInput(session, "nvs.income", "Desired Income Level:", value = input$pre.income)
+  })
+  # from tuition cost level choice on preference page  
+  observeEvent(input$pre.tuition, {
+    updateSliderInput(session, "nvs.tuition", "Desired Tuition Level:", value = input$pre.tuition)
+  })
   
-   }) 
-
+  #Table prep with filters and Column choices for second table
+  new_var <- reactive({
+    master1 %>% filter(school.name %in% school.name_var(), degree.name %in% degree.name_var(),
+                       occ.name %in% occ.name_var() , cip.name %in% cip.name_var()) %>% 
+      select(school.name, degree.name, cip.name, occ.name,InStOff, X25p)
+  })
+  #Second Table after choosing rows    
+  output$row.choice.table <- renderDataTable({ 
+    DT::datatable(data = new_var()[input$nvs.choice.table_rows_selected,],
+                  options = list(pageLength = 10), selection = list(mode = "none"))
+  })
 }
 shinyApp(ui = ui, server = server)
