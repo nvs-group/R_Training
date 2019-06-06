@@ -94,24 +94,24 @@ ui <- fluidPage(h1("College Planning"),
                                                               )
                                                             )
                                                           )),
-                                                 tabPanel("Occupation Name select",
-                                                          h3("What occupation are you planning to have?"),
-                                                          
-                                                          selectInput(inputId = "pre.occ.name",
-                                                                      label = "",
-                                                                      choices = levels(master1$occ.name),
-                                                                      multiple = TRUE)
-                                                 ),
+#                                                 tabPanel("Occupation Name select",
+#                                                          h3("What occupation are you planning to have?"),
+#                                                          
+#                                                          selectInput(inputId = "pre.occ.name",
+#                                                                      label = "",
+#                                                                      choices = levels(master1$occ.name),
+#                                                                      multiple = TRUE)
+#                                                 ),
                                                  
-                                                 tabPanel("Curriculum Name select",
-                                                          
-                                                          h3("What curriculum are you planning to study?"),
-                                                          
-                                                          selectInput(inputId = "pre.cip.name",
-                                                                      label = "",
-                                                                      choices = levels(master1$cip.name),
-                                                                      multiple = TRUE)
-                                                 ),
+#                                                 tabPanel("Curriculum Name select",
+#                                                          
+#                                                          h3("What curriculum are you planning to study?"),
+#                                                          
+#                                                          selectInput(inputId = "pre.cip.name",
+#                                                                      label = "",
+#                                                                      choices = levels(master1$cip.name),
+#                                                                      multiple = TRUE)
+#                                                 ),
                                                  
                                                  tabPanel("Salary Select",
                                                           h3("How much income would you like to make in 10 to 15 years?"), 
@@ -247,13 +247,48 @@ server <- function(input, output, session) {
         input$nvs.cip.name
       }
   })
+  
+  cip.cat_var <- reactive ({
+    if(is.null(input$nvs.cip.cat)){
+      sort(unique(master1$cip.cat))} else {
+        cip1$CIP_Code[cip1$CIP_Category %in% input$nvs.cip.cat]
+      }
+  })
+  occ.cat_var <- reactive ({
+    if(is.null(input$nvs.occ.cat)){
+      sort(unique(master1$soc.cat))} else {
+        soc1$SOC_Code[soc1$SOC_Cat_Name %in% input$nvs.occ.cat]
+    }
+  })
+  
+  occ_var <- reactive ({
+    soc1$SOC_Cat_Name[soc1$SOC_Cat_Name %in% input$pre.occupation1 | soc1$SOC_Cat_Name %in% input$pre.occupation2]
+  })
+  
+  cip_var <- reactive ({
+    cip1$CIP_Category[cip1$CIP_Category %in% input$survey.Cip_Category1 |cip1$CIP_Category %in% input$survey.Cip_Category2 |
+                    cip1$CIP_Category %in% input$survey.Cip_Category3 | cip1$CIP_Category %in% input$survey.Cip_Category4]
+    
+  })
   #Filter for First Table
   table_var <- reactive({
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
            occ.name %in% occ.name_var(), cip.name %in% cip.name_var(),
-           X10p >= input$nvs.income, InStOff <= input$nvs.tuition)
+           X10p >= input$nvs.income, InStOff <= input$nvs.tuition, cip.cat %in% cip.cat_var(), 
+           soc.cat %in% occ.cat_var())
   })
-  
+  observe ({
+    req(cip_var())
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:", selected = cip_var())
+      print(cip.cat_var())
+    
+  })
+  observeEvent (occ_var(),{
+    
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", selected = occ_var())
+      print(occ_var())
+      print(occ.cat_var())
+  }) 
   observe({
     if(is.null(input$nvs.school.name)) {
       updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))  
@@ -267,6 +302,14 @@ server <- function(input, output, session) {
     if(is.null(input$nvs.cip.name)) {
       updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
     }
+    if(is.null(input$nvs.cip.cat)) {
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:",
+                        choices = cip1$CIP_Category[cip1$CIP_Code %in% table_var()$cip.cat])
+    }
+    if(is.null(input$nvs.occ.cat)){
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", 
+                        choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
+    }
   })
   #First Table
   observe ( {  
@@ -277,6 +320,44 @@ server <- function(input, output, session) {
                     options = list(pageLength = 10),selection = list(mode = "multiple"))
     })
   })
+  observeEvent(input$nvs.occ.cat, {
+    if(is.null(input$nvs.school.name)) {
+      updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))
+    }
+    if(is.null(input$nvs.degree.name)) {
+      updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.occ.name)) {
+      updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
+    }
+    if(is.null(input$nvs.cip.name)) {
+      updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+    if(is.null(input$nvs.cip.cat)) {
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:",
+                        choices = cip1$CIP_Category[cip1$CIP_Code %in% table_var()$cip.cat])
+    }
+    
+  })  
+  observeEvent(input$nvs.cip.cat, {
+    if(is.null(input$nvs.school.name)) {
+      updateSelectInput(session, "nvs.school.name", "School Name:", choices = unique(table_var()$school.name))
+    }
+    if(is.null(input$nvs.degree.name)) {
+      updateSelectInput(session, "nvs.degree.name", "Degree Name:", choices = unique(table_var()$degree.name))
+    }
+    if(is.null(input$nvs.occ.name)) {
+      updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
+    }
+    if(is.null(input$nvs.cip.name)) {
+      updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+    if(is.null(input$nvs.occ.cat)){
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", 
+                        choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
+    }
+  })
+  
   #Using input to school prefernece to update other fields choices
   observeEvent(input$nvs.school.name, {
     if(is.null(input$nvs.degree.name)) {
@@ -288,6 +369,15 @@ server <- function(input, output, session) {
     if(is.null(input$nvs.cip.name)) {
       updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
     }
+    if(is.null(input$nvs.cip.cat)) {
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:",
+                        choices = cip1$CIP_Category[cip1$CIP_Code %in% table_var()$cip.cat])
+    }
+    if(is.null(input$nvs.occ.cat)){
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", 
+                        choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
+    }
+  
   })
   
   observeEvent(input$nvs.degree.name, {
@@ -300,6 +390,14 @@ server <- function(input, output, session) {
     if(is.null(input$nvs.cip.name)) {
       updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
     }
+    if(is.null(input$nvs.cip.cat)) {
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:",
+                        choices = cip1$CIP_Category[cip1$CIP_Code %in% table_var()$cip.cat])
+    }
+    if(is.null(input$nvs.occ.cat)){
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", 
+                        choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
+    }
   })
   observeEvent(input$nvs.occ.name, {
     if(is.null(input$nvs.school.name)) {
@@ -310,6 +408,14 @@ server <- function(input, output, session) {
     }
     if(is.null(input$nvs.cip.name)) {
       updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", choices = unique(table_var()$cip.name))
+    }
+    if(is.null(input$nvs.cip.cat)) {
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:",
+                        choices = cip1$CIP_Category[cip1$CIP_Code %in% table_var()$cip.cat])
+    }
+    if(is.null(input$nvs.occ.cat)){
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", 
+                        choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
     }
   })  
   observeEvent(input$nvs.cip.name, {  
@@ -322,12 +428,17 @@ server <- function(input, output, session) {
     if(is.null(input$nvs.occ.name)) {
       updateSelectInput(session, "nvs.occ.name", "Occupation Name:", choices = unique(table_var()$occ.name))
     }
-    
+    if(is.null(input$nvs.cip.cat)) {
+      updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:",
+                        choices = cip1$CIP_Category[cip1$CIP_Code %in% table_var()$cip.cat])
+    }
+    if(is.null(input$nvs.occ.cat)){
+      updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", 
+                        choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
+    }
   })    
   
-  
-  
-  
+
   # from school choice on preference page  
   observeEvent(input$pre.school.name, {
     updateSelectInput(session, "nvs.school.name", "School Name:", selected = input$pre.school.name)
@@ -337,13 +448,13 @@ server <- function(input, output, session) {
     updateSelectInput(session, "nvs.degree.name", "Degree Name:", selected = input$pre.degree.name)
   })
   # from occupation name choice on preference page    
-  observeEvent(input$pre.occ.name, {
-    updateSelectInput(session, "nvs.occ.name", "Occupation Name:", selected = input$pre.occ.name)
-  })
+#  observeEvent(input$pre.occ.name, {
+#    updateSelectInput(session, "nvs.occ.name", "Occupation Name:", selected = input$pre.occ.name)
+#  })
   # from curriculum name choice on preference page  
-  observeEvent(input$pre.cip.name, {
-    updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", selected = input$pre.cip.name)
-  })
+#  observeEvent(input$pre.cip.name, {
+#    updateSelectInput(session, "nvs.cip.name", "Curriculum Name:", selected = input$pre.cip.name)
+#  })
   # from income level choice on preference page  
   observeEvent(input$pre.income, {
     updateSliderInput(session, "nvs.income", "Desired Income Level:", value = input$pre.income)
@@ -355,8 +466,9 @@ server <- function(input, output, session) {
   
   #Table prep with filters and Column choices for second table
   new_var <- reactive({
-    master1 %>% filter(school.name %in% school.name_var(), degree.name %in% degree.name_var(),
-                       occ.name %in% occ.name_var() , cip.name %in% cip.name_var()) %>% 
+#    master1 %>% filter(school.name %in% school.name_var(), degree.name %in% degree.name_var(),
+#                       occ.name %in% occ.name_var() , cip.name %in% cip.name_var()) %>% 
+    table_var() %>%
       select(school.name, degree.name, cip.name, occ.name,InStOff, X25p)
   })
   #Second Table after choosing rows    
