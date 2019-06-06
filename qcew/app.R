@@ -23,8 +23,11 @@ library(shiny)
 # oe.areatype <- read.delim("https://download.bls.gov/pub/time.series/oe/oe.areatype")
 
 
-series_title_choices <- levels(oe.series$series_title)
-area_name_choices <- levels(oe.area$area_name)
+series_title_choices <- unique(oe.datatype$datatype_name)
+
+
+# area_name_choices <- unique(filter(oe.areatype, areatype_code == "M"))
+area_name_choices <- oe.area %>% filter(areatype_code == "M") %>% select(area_name)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -49,9 +52,11 @@ ui <- fluidPage(
                         ),
             sliderInput("years",
                         "Which years:",
-                        min = min(oe.data$year),
-                        max = max(oe.data$year),
-                        step = 1
+                        min = 1990,
+                        max = 2018,
+                        step = 1,
+                        value = c("2012","2018"),
+                        sep = ""
                         )
                     ),
 
