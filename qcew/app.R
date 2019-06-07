@@ -14,20 +14,21 @@ library(shiny)
 # import oe.area
 # oe.area <- read.delim("https://download.bls.gov/pub/time.series/oe/oe.area")
 
-
 # import oe.series
 # oe.series <- read.delim("https://download.bls.gov/pub/time.series/oe/oe.series")
 
-
 # import oe.areatype
 # oe.areatype <- read.delim("https://download.bls.gov/pub/time.series/oe/oe.areatype")
+
+# import oe.datatype
+# oe.datatype <- read.delim("https://download.bls.gov/pub/time.series/oe/oe.datatype")
 
 
 series_title_choices <- unique(oe.datatype$datatype_name)
 
 
 # area_name_choices <- unique(filter(oe.areatype, areatype_code == "M"))
-area_name_choices <- oe.area %>% filter(areatype_code == "M") %>% select(area_name)
+area_name_choices <- oe.area %>% filter(areatype_code == "M") %>% select(area_name,area_code)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -42,13 +43,15 @@ ui <- fluidPage(
             #             "Select Area Type",
             #             choices = levels(oe.areatype$areatype_name)
             #             ),
-            selectInput("area",
+            selectizeInput("area",
                         "Select Area",
-                        choices = area_name_choices
+                        choices = area_name_choices,
+                        multiple = TRUE
                         ),
             selectInput("series_title",
                         "Select Series",
-                        choices = series_title_choices
+                        choices = series_title_choices,
+                        multiple = TRUE
                         ),
             sliderInput("years",
                         "Which years:",
