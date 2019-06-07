@@ -60,27 +60,39 @@ ui <- fluidPage(
                         step = 1,
                         value = c("2012","2018"),
                         sep = ""
-                        )
+                        ),
+            downloadButton("downloadData", label = "Download")
                     ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
+           # plotOutput("distPlot")
         )
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+  
+  payload <- list(
+    'seriesid'= oe.series %>% filter(area_code == input$area),
+    'startyear'= input$years[1],
+    'endyear'= input$years[2],
+    'catalog'=FALSE,
+    'calculations'=TRUE,
+    'annualaverage'=TRUE,
+    'registrationKey'='6c41425b61434ef29aea144c1a9b22a2')
+  response <- blsAPI(payload, 2)
+  data <- fromJSON(response)
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
+    output$downloadData <- downloadHandler(
+      filename = function() {
+        paste('data-',Sys.Date(), '.csv', sep='')
+      },
+      content = function(con) {
+        write.csv(data, con)
+      }
+    )
 }
 
 # Run the application 
