@@ -55,7 +55,10 @@ ui <- dashboardPage(
               h2("Welcome and Hello")
       ),
       tabItem(tabName = "tools",
-              h2("This is where tools go.")
+              h2("This is where tools go."),
+              checkboxGroupInput(inputId = "column.names", label = "Pick the columns you would like",
+                                 selected = c("school.name", "degree.name", "occ.name", "cip.name", "cip.cat",
+                                              "soc.cat"), choices = names(master1))
       ),
       
       tabItem(tabName = "instructions",
@@ -274,7 +277,7 @@ server <- function(input, output, session) {
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
            occ.name %in% occ.name_var(), cip.name %in% cip.name_var(),
            cip.cat %in% cip.cat_var(), 
-           soc.cat %in% occ.cat_var())
+           soc.cat %in% occ.cat_var()) 
   })
   #X10p >= input$nvs.income, InStOff <= input$nvs.tuition,
   observe ({
@@ -306,12 +309,13 @@ server <- function(input, output, session) {
                         choices = soc1$SOC_Cat_Name[soc1$SOC_Code %in% table_var()$soc.cat])
     }
   })
+  
   #First Table
   observe ( {  
     #   req(input$nvs.school.name)
     
     output$nvs.choice.table <- renderDataTable({
-      DT::datatable(data = table_var(), 
+      DT::datatable(data = table_var() %>% select(input$column.names), 
                     options = list(pageLength = 10),selection = list(mode = "multiple"))
     })
   })
@@ -337,7 +341,8 @@ server <- function(input, output, session) {
   
   #Table prep with filters and Column choices for second table
   new_var <- reactive({
-    table_var() %>% select(occ.name, school.name, degree.name, Experience, entry.degree, X50p)
+#    table_var() %>% select(occ.name, school.name, degree.name, Experience, entry.degree, X50p)
+    table_var() %>% select(input$column.names)
   })
   #Second Table after choosing rows    
   output$row.choice.table <- renderDataTable({ 
