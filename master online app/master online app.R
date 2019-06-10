@@ -194,7 +194,7 @@ ui <- dashboardPage(
                 ),
                 box(
                   width = 9,
-                  DT::dataTableOutput(outputId = "nvs.choice.table")
+                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "nvs.choice.table"))
                 )
               )
               
@@ -206,7 +206,7 @@ ui <- dashboardPage(
                 ),
                 box(
                   width = 9,
-                  DT::dataTableOutput(outputId = "row.choice.table")
+                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "row.choice.table"))
                 ))
       )
       
