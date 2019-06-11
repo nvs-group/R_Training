@@ -10,7 +10,10 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-master1 <- read.csv("C:/Users/romri/Documents/NVS/shinyapp/master1.txt")
+#master1 <- read.csv("C:/Users/romri/Documents/NVS/shinyapp/master1.txt")
+#master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
+#master1 <- read.csv("~/Dropbox/R-Studio/R_Training/Master1.txt")
+
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
@@ -155,32 +158,38 @@ ui <- dashboardPage(
                     selectInput(inputId = "nvs.school.name",
                                 label= "School Name:",
                                 choices =  levels(master1$school.name),
-                                multiple = TRUE),
+                                multiple = TRUE,
+                                selectize = TRUE),
                     
                     selectInput(inputId = "nvs.degree.name",
                                 label = "Degree Name:",
                                 choices =  levels(master1$degree.name),
-                                multiple = TRUE),
+                                multiple = TRUE,
+                                selectize = TRUE),
                     
                     selectInput(inputId = "nvs.cip.cat",
                                 label = "Curriculum Category:",
                                 choices = cip1$CIP_Category,
-                                multiple = TRUE),
+                                multiple = TRUE,
+                                selectize = TRUE),
                     
                     selectInput(inputId = "nvs.cip.name",
                                 label = "Curriculum Name:",
                                 choices = levels(master1$cip.name),
-                                multiple = TRUE),
+                                multiple = TRUE,
+                                selectize = TRUE),
                     
                     selectInput(inputId = "nvs.occ.cat",
                                 label = "Occupation Category:",
                                 choices = soc1$SOC_Cat_Name,
-                                multiple = TRUE),
+                                multiple = TRUE,
+                                selectize = TRUE),
                     
                     selectInput(inputId = "nvs.occ.name",
                                 label = "Occupation Name:",
                                 choices = levels(master1$occ.name),
-                                multiple = TRUE),
+                                multiple = TRUE,
+                                selectize = TRUE),
                     
                     sliderInput(inputId = "nvs.income",
                                 label = "Desired Income Level:",
