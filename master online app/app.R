@@ -10,7 +10,7 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-#master1 <- read.csv("C:/Users/romri/Documents/NVS/shinyapp/master1.txt")
+#master1 <- read.csv("master1.txt")
 master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
@@ -26,7 +26,9 @@ cip_group1 <- (cip1$CIP_Category[1:10])
 cip_group2 <- (cip1$CIP_Category[11:19])
 cip_group3 <- (cip1$CIP_Category[20:28])
 cip_group4 <- (cip1$CIP_Category[29:37])
-
+salary1 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double(), run_total1 = double())
+salary2 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double(), run_total1 = double())
+salary3 <- data.frame(age1 = double(), age_factor1 = double(), xsalary1 = double(), run_total1 = double())
 
 ui <- dashboardPage(
   dashboardHeader(title = "College Planning"),
@@ -61,11 +63,9 @@ ui <- dashboardPage(
                                  selected = c("school.name", "degree.name", "occ.name", "cip.name", "cip.cat",
                                               "soc.cat"), choices = names(master1))
       ),
-      
       tabItem(tabName = "instructions",
               h2("Go through each tab and select the items you currently know about")
       ),
-      
       tabItem(tabName = "school",
               h3("I know exactly where I want to go:"),
               box(
@@ -86,7 +86,6 @@ ui <- dashboardPage(
                             multiple = TRUE)
               )
       ),
-      
       tabItem(tabName = "occupation",
               h3("Which of these occupations would you consider?"),
               
@@ -101,7 +100,6 @@ ui <- dashboardPage(
                                        label = "",
                                        choices = soc_group2))
               )
-              
       ),
       tabItem(tabName = "curriculum",
               h3("Please check all curriculum that you are interested in"),
@@ -128,7 +126,6 @@ ui <- dashboardPage(
                 )
               )
       ),
-      
       tabItem(tabName = "salary",
               h3("How much income would you like to make in 10 to 15 years?"),
               box(
@@ -194,26 +191,44 @@ ui <- dashboardPage(
                                 value = max(sort(unique(master1$InStOff))),
                                 min = min(sort(unique(master1$InStOff))),
                                 max = max(sort(unique(master1$InStOff))))
-                    
                 ),
                 box(
                   width = 9,
                   div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "nvs.choice.table"))
                 )
               )
-              
       ),
       tabItem(tabName = "compare",
               fluidRow(
-                box(
-                  width = 3
+                box(width = 4,
+                    tableOutput(outputId = "row.choice.table1")
                 ),
-                box(
-                  width = 9,
-                  div(style = 'overflow-x: scroll',DT::dataTableOutput(outputId = "row.choice.table"))
-                ))
+                box(width = 4,
+                    tableOutput(outputId = "row.choice.table2")
+                ),
+                box(width = 4,
+                    tableOutput(outputId = "row.choice.table3")
+                )
+              ),
+              hr(),
+              fluidRow(
+                box(width = 4,
+                    DT::dataTableOutput(outputId = "row.choice.wage1")
+                ),
+                box(width = 4,
+                    DT::dataTableOutput(outputId = "row.choice.wage2")
+                ),
+                box(width = 4,
+                    DT::dataTableOutput(outputId = "row.choice.wage3")
+                )
+              ),
+              hr(),
+              fluidRow(
+                box(width = 6,
+                    plotOutput("cummulative.plot")
+                )
+              )
       )
-      
     )
   )
 )
@@ -228,7 +243,6 @@ server <- function(input, output, session) {
       }
   })
   #Reactive variable that uses selected choices or full column if empty 
-  
   degree.name_var <- reactive({
     if(is.null(input$nvs.degree.name )) {
       unique(master1$degree.name)} else {
@@ -236,7 +250,6 @@ server <- function(input, output, session) {
       }
   })
   #Reactive variable that uses selected choices or full column if empty
-  
   occ.name_var <- reactive({
     if(is.null(input$nvs.occ.name)) {
       unique(master1$occ.name)} else {
@@ -244,7 +257,6 @@ server <- function(input, output, session) {
       }
   })  
   #Reactive variable that uses selected choices or full column if empty
-  
   cip.name_var <- reactive({
     if(is.null(input$nvs.cip.name)) {
       unique(master1$cip.name)} else {
@@ -263,29 +275,26 @@ server <- function(input, output, session) {
         soc1$SOC_Code[soc1$SOC_Cat_Name %in% input$nvs.occ.cat]
       }
   })
-  
   occ_var <- reactive ({
     soc1$SOC_Cat_Name[soc1$SOC_Cat_Name %in% input$pre.occupation1 | soc1$SOC_Cat_Name %in% input$pre.occupation2]
   })
-  
   cip_var <- reactive ({
     cip1$CIP_Category[cip1$CIP_Category %in% input$survey.Cip_Category1 |cip1$CIP_Category %in% input$survey.Cip_Category2 |
                         cip1$CIP_Category %in% input$survey.Cip_Category3 | cip1$CIP_Category %in% input$survey.Cip_Category4]
-    
   })
   #Filter for First Table
   table_var <- reactive({
     filter(master1, school.name %in% school.name_var(), degree.name %in% degree.name_var(),
            occ.name %in% occ.name_var(), cip.name %in% cip.name_var(),
-           cip.cat %in% cip.cat_var(), 
-           soc.cat %in% occ.cat_var()) 
+           cip.cat %in% cip.cat_var(), soc.cat %in% occ.cat_var()) 
   })
   #X10p >= input$nvs.income, InStOff <= input$nvs.tuition,
   observe ({
     req(cip_var())
     updateSelectInput(session, "nvs.cip.cat", "Curriculum Category:", selected = cip_var())
   })
-  observeEvent (occ_var(),{
+  observe({
+    req(occ_var())
     updateSelectInput(session, "nvs.occ.cat", "Occupation Category:", selected = occ_var())
   }) 
   observe({
@@ -316,13 +325,11 @@ server <- function(input, output, session) {
     #   req(input$nvs.school.name)
     
     output$nvs.choice.table <- renderDataTable({
-      DT::datatable(data = table_var() %>% select(input$column.names), 
+      DT::datatable(data = table_var()  %>% select(input$column.names), 
                     options = list(pageLength = 10),selection = list(mode = "multiple"))
     })
   })
   #ObserveEvents go back here  
-  
-  
   # from school choice on preference page  
   observeEvent(input$pre.school.name, {
     updateSelectInput(session, "nvs.school.name", "School Name:", selected = input$pre.school.name)
@@ -339,16 +346,107 @@ server <- function(input, output, session) {
   observeEvent(input$pre.tuition, {
     updateSliderInput(session, "nvs.tuition", "Desired Tuition Level:", value = input$pre.tuition)
   })
-  
   #Table prep with filters and Column choices for second table
   new_var <- reactive({
-#    table_var() %>% select(occ.name, school.name, degree.name, Experience, entry.degree, X50p)
-    table_var() %>% select(input$column.names)
+    table_var()[input$nvs.choice.table_rows_selected,] %>% select(occ.name, school.name, degree.name, X17p)
+    #    table_var() %>% select(input$column.names)
   })
-  #Second Table after choosing rows    
-  output$row.choice.table <- renderDataTable({ 
-    DT::datatable(data = new_var()[input$nvs.choice.table_rows_selected,],
-                  options = list(pageLength = 10), selection = list(mode = "none"))
+  
+  #choice Tables after choosing rows  
+  
+  
+  observe ({
+    if(nrow(new_var()) > 0) {
+      output$row.choice.table1 <- renderTable( t(new_var()[1,]), bordered = TRUE)
+      y <- 0
+      x <- as.double(new_var()[1,] %>% select(X17p))
+      a <- 17
+      af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
+      y <- x + y
+      s1 <- list(age1 = a, age_factor1 = af, xsalary1 = x, run_total1 = y)
+      salary1 <- rbind(salary1, s1)
+      for(i in (a+1:53)) {
+        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+        x <- x * af
+        x <- round(x, 2)
+        y <- x + y
+        s1 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        salary1 <- rbind(salary1, s1)
+      }
+      
+      output$row.choice.wage1 <- renderDataTable({
+        DT::datatable(data = salary1, options = list(pageLength = 10, searching = FALSE, ordering = FALSE))
+      })
+      output$cummulative.plot <- renderPlot({
+        ggplot() + geom_line(data = salary1, aes(x = age1 ,y = run_total1/1000), color="Blue",
+                             show.legend = TRUE) +
+          xlab('AGE') +
+          ylab('Cummulation')
+      })
+      
+    }
+    
+    if(nrow(new_var()) > 1) {
+      output$row.choice.table2 <- renderTable( t(new_var()[2,]), bordered = TRUE)
+      y <- 0
+      x <- as.double(new_var()[2,] %>% select(X17p))
+      a <- 17
+      af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
+      y <- x + y
+      s2 <- list(age1 = a, age_factor1 = af, xsalary1 = x, run_total1 = y)
+      salary2 <- rbind(salary2, s2)
+      for(i in (a+1:53)) {
+        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+        x <- x * af
+        x <- round(x, 2)
+        y <- x + y
+        s2 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        salary2 <- rbind(salary2, s2)
+      }
+      output$row.choice.wage2 <- renderDataTable({
+        DT::datatable(data = salary2, options = list(pageLength = 10, searching = FALSE, ordering = FALSE))
+      })
+      
+      output$cummulative.plot <- renderPlot({
+        ggplot() + geom_line(data = salary1, aes(x = age1 ,y = run_total1/1000), colour = "Blue",
+                             show.legend = TRUE) +
+          geom_line(data = salary2, aes(x = age1, y = run_total1/1000), colour = "Green", 
+                    show.legend = TRUE) +
+          xlab('AGE') +
+          ylab('Cummulation') 
+      })
+    }
+    if(nrow(new_var()) > 2) {
+      output$row.choice.table3 <- renderTable( t(new_var()[3,]), bordered = TRUE)
+      y <- 0
+      x <- as.double(new_var()[3,] %>% select(X17p))
+      a <- 17
+      af <- (1 + ((0.00002 * (a ^ 2)) - 0.0034 * a + 0.127 ))
+      y <- x + y
+      s3 <- list(age1 = a, age_factor1 = af, xsalary1 = x, run_total1 = y)
+      salary3 <- rbind(salary3, s3)
+      for(i in (a+1:53)) {
+        af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
+        x <- x * af
+        x <- round(x, 2)
+        y <- x + y
+        s3 <- list(age1 = i, age_factor1 = af, xsalary1 = x, run_total1 = y)
+        salary3 <- rbind(salary3, s3)
+      }
+      output$row.choice.wage3 <- renderDataTable({
+        DT::datatable(data = salary3, options = list(pageLength = 10, searching = FALSE, ordering = FALSE))
+      })
+      output$cummulative.plot <- renderPlot({
+        ggplot() + geom_line(data = salary1, aes(x = age1 ,y = run_total1/1000), colour = "Blue",
+                             show.legend = TRUE) +
+          geom_line(data = salary2, aes(x = age1, y = run_total1/1000), colour = "Green",
+                    show.legend = TRUE) +
+          geom_line(data = salary3, aes(x = age1, y = run_total1/1000), colour = "Red",
+                    show.legend = TRUE) +
+          xlab('AGE') +
+          ylab('Cummulation')
+      })
+    }
   })
 }
 shinyApp(ui = ui, server = server)
