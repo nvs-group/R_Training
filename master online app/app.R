@@ -383,9 +383,7 @@ server <- function(input, output, session) {
           xlab('AGE') +
           ylab('Cummulation')
       })
-      
-    }
-    
+  }
     if(nrow(new_var()) > 1) {
       output$row.choice.table2 <- renderTable( t(new_var()[2,]), bordered = TRUE)
       y <- 0
@@ -446,6 +444,21 @@ server <- function(input, output, session) {
           xlab('AGE') +
           ylab('Cummulation')
       })
+    }
+  })
+  observe({
+    if(nrow(new_var()) < 3) {
+      output$row.choice.wage3 <- renderDataTable({ NULL })
+      output$row.choice.table3 <- renderTable( NULL )
+    }
+    if(nrow(new_var()) < 2) {
+      output$row.choice.wage2 <- renderDataTable({ NULL })
+      output$row.choice.table2 <- renderTable( NULL )
+    }
+    if(nrow(new_var()) < 1) {
+      output$row.choice.wage1 <- renderDataTable({ NULL })
+      output$row.choice.table1 <- renderTable( NULL )
+      output$cummulative.plot <- renderPlot( {NULL})
     }
   })
 }
