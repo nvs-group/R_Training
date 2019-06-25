@@ -362,8 +362,6 @@ server <- function(input, output, session) {
   })
   
   #choice Tables after choosing rows  
-  
-  
   observe ({
     if(nrow(new_var()) > 0) {
       output$row.choice.table1 <- renderUI({
@@ -403,11 +401,8 @@ server <- function(input, output, session) {
                                               if (dc == 18) {
                                                 years <- 1}
       
-      
-      
       y <- 0
       a <- input$age.begin
-      
       for(i in (a:(a + (years - 1)))) {
         af <- (1 + ((0.00002 * (i ^ 2)) - 0.0034 * i + 0.127 ))
         x <- as.double(new_var()[1,] %>% select(InStOff))
@@ -432,7 +427,7 @@ server <- function(input, output, session) {
       totalcost1 <- new_var()$InStOff[1] * years
       runtot1 <- (salary1$run_total[nrow(salary1)])
       roi1 <- (runtot1 + totalcost1) / totalcost1 * 100
-      r1 <- list(school.n = (new_var()$school.name[1]), roi.n = roi1)
+      r1 <- list(school.n = paste("1",new_var()$school.name[1], "\n", new_var()$occ.name[1]), roi.n = roi1)
       roi.data <- rbind(roi.data, r1)
       
       output$row.choice.wage1 <- renderDataTable({
@@ -522,9 +517,7 @@ server <- function(input, output, session) {
       totalcost1 <- new_var()$InStOff[2] * years
       runtot1 <- (salary2$run_total[nrow(salary2)])
       roi2 <- (runtot1 + totalcost1) / totalcost1 * 100
-      
-      r2 <- list(school.n = (new_var()$school.name[2]), roi.n = roi2)
-      
+      r2 <- list(school.n = paste("2", new_var()$school.name[2], "\n", new_var()$occ.name[2]), roi.n = roi2)
       roi.data <- rbind(roi.data, data.frame(as.list(r2)))
       
       output$row.choice.wage2 <- renderDataTable({
@@ -617,9 +610,7 @@ server <- function(input, output, session) {
       totalcost1 <- new_var()$InStOff[3] * years
       runtot1 <- (salary3$run_total[nrow(salary3)])
       roi3 <- (runtot1 + totalcost1) / totalcost1 * 100
-      
-      r3 <- list(school.n = (new_var()$school.name[3]), roi.n = roi3)
-      
+      r3 <- list(school.n = paste("3", new_var()$school.name[3], "\n", new_var()$occ.name[3]), roi.n = roi3)
       roi.data <- rbind(roi.data, data.frame(as.list(r3)))
       
       output$row.choice.wage3 <- renderDataTable({
