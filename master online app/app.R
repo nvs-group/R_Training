@@ -10,7 +10,8 @@ library(DT)
 library(tools)
 selectedrowindex = 0
 #Read in main data table from your local directory
-master1 <- read.csv("master1.txt")
+#master1 <- read.csv("master1.txt")
+master1 <- read.csv("https://www.dropbox.com/s/fgty42qwpkzudwz/master1.txt?dl=1")
 #Read cip data table and order alphabetically
 cip2 <- read_tsv("cip_code.txt")
 cip1 <- cip2[order(cip2$CIP_Category),]
